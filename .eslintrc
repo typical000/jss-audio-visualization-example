@@ -1,0 +1,18 @@
+{
+  "parser": "babel-eslint",
+  "extends": "eslint-config-jss",
+  "rules": {
+    "react/forbid-prop-types": ["error", {
+      "forbid": ["any", "array"]
+    }],
+    "import/no-unresolved": [2, {
+      "ignore": ["react", "react-dom"]
+    }]
+  },
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true
+    }
+  }
+}
