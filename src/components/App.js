@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {Component} from 'react'
 import injectSheet from 'react-jss'
 
 import GlobalStyles from './GlobalStyles'
@@ -7,6 +7,7 @@ import theme from '../theme'
 
 const styles = {
   app: {
+    overflow: 'hidden',
     width: '100vw',
     height: '100vh',
     background: theme.background,
@@ -23,6 +24,12 @@ const styles = {
     position: 'absolute',
     zIndex: 10
   },
+  audio: {
+    top: 20,
+    right: 20,
+    position: 'absolute',
+    zIndex: 10
+  },
   scene: {
     position: 'absolute',
     top: '50%',
@@ -31,17 +38,30 @@ const styles = {
   }
 }
 
-const App = ({classes}) => (
-  <GlobalStyles>
-    <div className={classes.app}>
-      <div className={classes.title}>
-        HTML5 Aduio visualization with JSS
-      </div>
-      <div className={classes.scene}>
-        <Player />
-      </div>
-    </div>
-  </GlobalStyles>
-)
+class App extends Component {
+  render() {
+    const {classes} = this.props
+
+    return (
+      <GlobalStyles>
+        <div className={classes.app}>
+          <div className={classes.title}>
+            HTML5 Aduio visualization with JSS
+          </div>
+          <audio
+            className={classes.audio}
+            src={"media/music.mp3"}
+            ref={(audio) => {this.audio = audio}}
+            controls
+            loop
+          />
+          <div className={classes.scene}>
+            <Player />
+          </div>
+        </div>
+      </GlobalStyles>
+    )
+  }
+}
 
 export default injectSheet(styles)(App)
