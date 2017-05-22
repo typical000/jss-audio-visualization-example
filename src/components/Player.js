@@ -11,21 +11,33 @@ let update
 const AudioContext = window.AudioContext || window.webkitAudioContext
 
 const amount = 128
-const radius = 200
-const maxSoundRadius = 300
+const radius = 100
+const maxSoundRadius = 150
 
 const styles = {
   player: {
-    width: radius,
-    height: radius,
-    position: 'relative'
+    width: radius * 2,
+    height: radius * 2,
+    position: 'relative',
+    '&::after': {
+      content: '""',
+      width: radius * 6,
+      height: radius * 6,
+      position: 'absolute',
+      zIndex: 1,
+      background: `radial-gradient(closest-side, ${theme.active}, transparent)`,
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      opacity: 0.15
+    }
   },
   circle: {
     width: '100%',
     height: '100%',
     borderRadius: '50%',
     position: 'relative',
-    zIndex: 2,
+    zIndex: 3,
     background: theme.background,
     boxShadow: [{
       blur: 50,
@@ -46,7 +58,7 @@ const styles = {
     height: 3,
     background: `linear-gradient(to right, ${theme.background} 50%, ${theme.active})`,
     borderRadius: 10,
-    zIndex: 1,
+    zIndex: 2,
     transition: ['linear', 'all', '100ms'],
     boxShadow: [{
       blur: 10,
