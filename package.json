@@ -14,7 +14,7 @@
   "license": "MIT",
   "scripts": {
     "dev-server": "cross-env NODE_ENV=development PORT=3000 node ./bin/webpack-dev-server.js",
-    "clean": "rimraf -fr './build/!(CNAME)**'",
+    "clean": "rimraf -fr './dist/**'",
     "build:dev": "npm run clean && cross-env NODE_ENV=development webpack --config ./webpack.config.dev",
     "build:prod": "npm run clean && cross-env NODE_ENV=production webpack --config ./webpack.config.prod",
     "lint": "eslint ./src",
@@ -50,8 +50,10 @@
     "babel-polyfill": "^6.23.0",
     "jss": "^7.1.2",
     "jss-preset-default": "^2.0.0",
+    "normalize-jss": "^3.1.0",
     "react": "^15.5.4",
-    "react-dom": "^15.5.4"
+    "react-dom": "^15.5.4",
+    "react-jss": "^6.1.1"
   },
   "lint-staged": {
     "./src ./tests ./*.js": [

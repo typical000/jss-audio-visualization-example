@@ -19,7 +19,6 @@ var compiler = webpack(webpackConfig)
 var serverConfig = {
   stats: { colors: true },
   hot: true,
-  inline: true,
   contentBase: webpackConfig.output.path
 }
 

@@ -3,12 +3,13 @@
 var webpack = require('webpack')
 var path = require('path')
 var CopyFilesPlugin = require('copy-webpack-plugin')
-var config = require('./package.json')
+
+var dependencies = require('./package.json').dependencies
 
 module.exports = {
   entry: {
-    app: [ path.join(__dirname, 'src', 'index.js') ],
-    vendor: Object.keys(config.dependencies)
+    app: [path.join(__dirname, 'src', 'index.js')],
+    vendor: Object.keys(dependencies)
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -16,8 +17,9 @@ module.exports = {
     filename: 'bundle.js'
   },
   module: {
+    noParse: /\.min\.js/,
     rules: [
-      { test: /\.jsx?$/, exclude: /node_modules/, use: 'babel-loader'},
+      { test: /\.jsx?$/, exclude: /node_modules/, use: ['babel-loader']},
       { test: /\.woff(\?v=\d+\.\d+\.\d+)?$/, use: 'url?limit=10000&mimetype=application/font-woff' },
       { test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/, use: 'url?limit=10000&mimetype=application/font-woff' },
       { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, use: 'url?limit=10000&mimetype=image/svg+xml' },
@@ -36,6 +38,9 @@ module.exports = {
     new CopyFilesPlugin([{
       from: './index.html',
       to: './index.html'
-    }]),
+    }, {
+      from: './src/media',
+      to: './media'
+    }])
   ]
 }
