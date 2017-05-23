@@ -43,11 +43,33 @@ class App extends Component {
     loadAudio('media/music.mp3').then(this.onLoad)
   }
 
+  // TODO: Move to utils
   onLoad = (audio) => {
+    // Define right audio context (Safari doesn't support without prefix)
+    const AudioContext = window.AudioContext || window.webkitAudioContext
 
-    // TODO: Process audio
-    console.log(audio)
+    const ctx = new AudioContext()
+    const audioSrc = ctx.createMediaElementSource(audio)
+    const analyser = ctx.createAnalyser()
 
+    // analyser.fftSize = 1024
+    analyser.fftSize = 32
+
+    audioSrc.connect(analyser)
+    // Preserva audio output
+    // audioSrc.connect(ctx.destination)
+
+    const frequencyData = new Uint8Array(analyser.frequencyBinCount)
+
+    const getFrame = () => {
+      requestAnimationFrame(getFrame)
+      analyser.getByteFrequencyData(frequencyData)
+
+      // console.log(frequencyData)
+    }
+
+    audio.play()
+    getFrame()
   }
 
   render() {
@@ -60,7 +82,7 @@ class App extends Component {
             HTML5 Aduio visualization with JSS
           </div>
           <div className={classes.scene}>
-            <Player audioNode={this.audio}/>
+            <Player />
           </div>
         </div>
       </GlobalStyles>

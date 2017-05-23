@@ -8,8 +8,6 @@ import tick from '../utils/tick'
 
 let update
 
-const AudioContext = window.AudioContext || window.webkitAudioContext
-
 const amount = 128
 const radius = 100
 const maxSoundRadius = 150
@@ -90,8 +88,7 @@ tick(() => {
 
 class Player extends Component {
   static propTypes = {
-    classes: PropTypes.object.isRequired,
-    audioNode: PropTypes.object
+    classes: PropTypes.object.isRequired
   }
 
   shouldComponentUpdate = () => false
