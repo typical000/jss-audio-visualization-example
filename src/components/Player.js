@@ -90,7 +90,8 @@ tick(() => {
 
 class Player extends Component {
   static propTypes = {
-    classes: PropTypes.object.isRequired
+    classes: PropTypes.object.isRequired,
+    audioNode: PropTypes.object
   }
 
   shouldComponentUpdate = () => false

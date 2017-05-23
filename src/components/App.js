@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import injectSheet from 'react-jss'
 
+import {loadAudio} from '../utils/audio'
 import GlobalStyles from './GlobalStyles'
 import Player from './Player'
 import theme from '../theme'
@@ -25,12 +26,6 @@ const styles = {
     position: 'absolute',
     zIndex: 10
   },
-  audio: {
-    top: 20,
-    right: 20,
-    position: 'absolute',
-    zIndex: 10
-  },
   scene: {
     position: 'absolute',
     top: '50%',
@@ -44,6 +39,17 @@ class App extends Component {
     classes: PropTypes.object.isRequired
   }
 
+  componentDidMount() {
+    loadAudio('media/music.mp3').then(this.onLoad)
+  }
+
+  onLoad = (audio) => {
+
+    // TODO: Process audio
+    console.log(audio)
+
+  }
+
   render() {
     const {classes} = this.props
 
@@ -53,19 +59,8 @@ class App extends Component {
           <div className={classes.title}>
             HTML5 Aduio visualization with JSS
           </div>
-          <audio
-            className={classes.audio}
-            src={'media/music.mp3'}
-            ref={(audio) => {
-              this.audio = audio
-            }}
-            controls
-            loop
-          >
-            <track kind={'captions'} />
-          </audio>
           <div className={classes.scene}>
-            <Player audioNode={this.audio} />
+            <Player audioNode={this.audio}/>
           </div>
         </div>
       </GlobalStyles>

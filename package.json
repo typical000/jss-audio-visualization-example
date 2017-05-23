@@ -56,7 +56,8 @@
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "react-jss": "^6.1.1",
-    "stats.js": "^0.17.0"
+    "stats.js": "^0.17.0",
+    "whatwg-fetch": "^2.0.3"
   },
   "lint-staged": {
     "./src ./tests ./*.js": [
