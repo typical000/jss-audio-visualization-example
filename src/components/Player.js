@@ -1,10 +1,10 @@
 import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import injectSheet from 'react-jss'
 import times from 'lodash/times'
 
-import GlobalStyles from './GlobalStyles'
 import theme from '../theme'
-import {tick} from '../utils/tick'
+import tick from '../utils/tick'
 
 let update
 
@@ -75,9 +75,9 @@ const styles = {
 times(amount, (i) => {
   styles[`bar${i}`] = {
     composes: '$bar',
-    transform: `rotate(${360/amount*i}deg)`,
+    transform: `rotate(${(360 / amount) * i}deg)`,
     // TODO: Don't set width
-    width: Math.random() * (maxSoundRadius - radius) + radius
+    width: (Math.random() * (maxSoundRadius - radius)) + radius
   }
 })
 
@@ -89,6 +89,9 @@ tick(() => {
 })
 
 class Player extends Component {
+  static propTypes = {
+    classes: PropTypes.object.isRequired
+  }
 
   shouldComponentUpdate = () => false
 
@@ -99,9 +102,7 @@ class Player extends Component {
       <div className={classes.player}>
         <div className={classes.circle} />
         <div className={classes.bars}>
-          {times(amount, (i) => (
-            <div key={i} className={classes[`bar${i}`]} />
-          ))}
+          {times(amount, i => <div key={i} className={classes[`bar${i}`]} />)}
         </div>
       </div>
     )

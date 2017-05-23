@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import injectSheet from 'react-jss'
 
 import GlobalStyles from './GlobalStyles'
@@ -39,6 +40,10 @@ const styles = {
 }
 
 class App extends Component {
+  static propTypes = {
+    classes: PropTypes.object.isRequired
+  }
+
   render() {
     const {classes} = this.props
 
@@ -50,13 +55,17 @@ class App extends Component {
           </div>
           <audio
             className={classes.audio}
-            src={"media/music.mp3"}
-            ref={(audio) => {this.audio = audio}}
+            src={'media/music.mp3'}
+            ref={(audio) => {
+              this.audio = audio
+            }}
             controls
             loop
-          />
+          >
+            <track kind={'captions'} />
+          </audio>
           <div className={classes.scene}>
-            <Player />
+            <Player audioNode={this.audio} />
           </div>
         </div>
       </GlobalStyles>

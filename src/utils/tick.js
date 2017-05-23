@@ -1,24 +1,24 @@
 import Stats from 'stats.js'
 
 const stats = (() => {
-  const stats = new Stats()
+  const fpsStats = new Stats()
 
-  stats.showPanel(0) // Show FPS
+  fpsStats.showPanel(0) // Show FPS
 
-  stats.dom.style.top = 'auto'
-  stats.dom.style.bottom = '20px'
-  stats.dom.style.left = '20px'
+  fpsStats.dom.style.top = 'auto'
+  fpsStats.dom.style.bottom = '20px'
+  fpsStats.dom.style.left = '20px'
 
-  document.body.appendChild(stats.dom)
+  document.body.appendChild(fpsStats.dom)
 
-  return stats
+  return fpsStats
 })()
 
-export const tick = (() => {
+const tick = (() => {
   const delay = 100
   let lastTime = Date.now()
 
-  return function tick(callback) {
+  return function ticker(callback) {
     const now = Date.now()
     stats.begin()
     if (now - lastTime > delay) {
@@ -26,6 +26,8 @@ export const tick = (() => {
       lastTime = now
     }
     stats.end()
-    requestAnimationFrame(tick.bind(null, callback))
+    requestAnimationFrame(ticker.bind(null, callback))
   }
 })()
+
+export default tick
