@@ -5,12 +5,17 @@ import times from 'lodash/times'
 
 import theme from '../theme'
 
-import {connectFrequencyToAnalyser, getFrequencyData} from '../utils/audio'
+import {
+  connectFrequencyToAnalyser,
+  getFrequencyData,
+  castFrequencyToFractional
+} from '../utils/audio'
 
+// TODO: Make changable via controls
+const amount = 256
 
-const amount = 128
 const radius = 100
-const maxSoundRadius = 150
+const maxSoundRadius = 250
 
 const styles = {
   player: {
@@ -53,20 +58,9 @@ const styles = {
     position: 'absolute',
     top: '50%',
     left: '50%',
-    height: 3,
-    background: `linear-gradient(to right, ${theme.background} 50%, ${theme.active})`,
+    height: 2,
     borderRadius: 10,
-    zIndex: 2,
-    transition: ['linear', 'all', '100ms'],
-    boxShadow: [{
-      blur: 10,
-      spread: 1,
-      color: theme.active
-    }, {
-      inset: 'inset',
-      blur: 2,
-      color: theme.active
-    }]
+    zIndex: 2
   }
 }
 
@@ -74,16 +68,15 @@ times(amount, (i) => {
   styles[`bar${i}`] = {
     composes: '$bar',
     transform: `rotate(${(360 / amount) * i}deg)`,
-    // TODO: Don't set width
-    width: (Math.random() * (maxSoundRadius - radius)) + radius
+    boxShadow: frequency => `0 0 10px 1px rgb(${frequency[i]}, ${frequency[i]}, 0)`,
+    background: frequency => `rgb(${frequency[i]}, ${frequency[i]}, 0)`,
+    width: frequency => castFrequencyToFractional(frequency[i]) * maxSoundRadius
   }
 })
 
-// Get some examples from here:
-// https://w-labs.at/experiments/audioviz/
-
 class Player extends Component {
   static propTypes = {
+    sheet: PropTypes.object.isRequired,
     classes: PropTypes.object.isRequired,
     audio: PropTypes.object.isRequired
   }
@@ -91,14 +84,21 @@ class Player extends Component {
   componentDidMount() {
     const {audio} = this.props
     let frequency = connectFrequencyToAnalyser(audio)
+    const resultFrequency = new Uint8Array(frequency.length * 2)
 
     const getFrame = () => {
       requestAnimationFrame(getFrame)
       frequency = getFrequencyData(frequency)
 
-      // TODO: Connect changed frequency with styles
-      // console.log(frequency)
+      // Make mirrored frequency for better visualization
+      resultFrequency.set(frequency)
+      resultFrequency.set(frequency, frequency.length)
+
+      this.props.sheet.update(resultFrequency)
     }
+
+    // TODO: Remove after debugging
+    audio.currentTime = 120
 
     audio.play()
     getFrame()
