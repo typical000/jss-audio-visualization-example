@@ -1,14 +1,6 @@
 const ctx = new (window.AudioContext || window.webkitAudioContext)()
 const analyser = ctx.createAnalyser()
 
-
-// TODO: Make changable via controls
-analyser.fftSize = 256
-analyser.minDecibels = -120 // -100
-analyser.maxDecibels = -30 // -30
-analyser.smoothingTimeConstant = 0.85 // 0.8
-
-
 export const loadAudio = url => new Promise((resolve) => {
   const audio = new Audio()
   audio.src = url
@@ -16,8 +8,15 @@ export const loadAudio = url => new Promise((resolve) => {
   audio.addEventListener('loadeddata', resolve.call(this, audio))
 })
 
-export const connectFrequencyToAnalyser = (audio) => {
+export const connectFrequencyToAnalyser = (audio, config) => {
   const audioSrc = ctx.createMediaElementSource(audio)
+
+  if (config) {
+    analyser.fftSize = config.fftSize || 256
+    analyser.minDecibels = config.minDecibels || -100
+    analyser.maxDecibels = config.maxDecibels || -30
+    analyser.smoothingTimeConstant = config.smoothingTimeConstant || 0.8
+  }
 
   audioSrc.connect(analyser)
   audioSrc.connect(ctx.destination)

@@ -69,8 +69,6 @@ times(amount, (i) => {
   styles[`bar${i}`] = {
     composes: '$bar',
     transform: `rotate(${(360 / amount) * i}deg)`,
-    // TODO: Box shadow so FPS-killing (from 40 down to 12)
-    // boxShadow: ({frequency}) => frequency && `0 0 10px 1px rgb(${frequency[i]}, ${frequency[i]}, 0)`,
     background: ({frequency}) => frequency && `rgba(${frequency[i]}, ${frequency[i]}, 0, ${castToFraction(frequency[i])})`,
     width: ({frequency}) => frequency && castToFraction(frequency[i]) * maxSoundRadius
   }
@@ -86,7 +84,9 @@ class Player extends Component {
   componentDidMount() {
     const {audio} = this.props
 
-    let frequency = connectFrequencyToAnalyser(audio)
+    let frequency = connectFrequencyToAnalyser(audio, {
+      fftSize: amount
+    })
     let rotation = 0
 
     const resultFrequency = new Uint8Array(frequency.length * 2)
