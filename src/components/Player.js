@@ -8,7 +8,7 @@ import theme from '../theme'
 import {
   connectFrequencyToAnalyser,
   getFrequencyData,
-  castFrequencyToFractional
+  castToFraction
 } from '../utils/audio'
 
 // TODO: Make changable via controls
@@ -22,6 +22,7 @@ const styles = {
     width: radius * 2,
     height: radius * 2,
     position: 'relative',
+    transform: ({rotation}) => `rotate(${rotation}deg)`,
     '&::after': {
       content: '""',
       width: radius * 6,
@@ -68,9 +69,10 @@ times(amount, (i) => {
   styles[`bar${i}`] = {
     composes: '$bar',
     transform: `rotate(${(360 / amount) * i}deg)`,
-    boxShadow: frequency => `0 0 10px 1px rgb(${frequency[i]}, ${frequency[i]}, 0)`,
-    background: frequency => `rgb(${frequency[i]}, ${frequency[i]}, 0)`,
-    width: frequency => castFrequencyToFractional(frequency[i]) * maxSoundRadius
+    // TODO: Box shadow so FPS-killing (from 40 down to 12)
+    // boxShadow: ({frequency}) => frequency && `0 0 10px 1px rgb(${frequency[i]}, ${frequency[i]}, 0)`,
+    background: ({frequency}) => frequency && `rgba(${frequency[i]}, ${frequency[i]}, 0, ${castToFraction(frequency[i])})`,
+    width: ({frequency}) => frequency && castToFraction(frequency[i]) * maxSoundRadius
   }
 })
 
@@ -83,22 +85,29 @@ class Player extends Component {
 
   componentDidMount() {
     const {audio} = this.props
+
     let frequency = connectFrequencyToAnalyser(audio)
+    let rotation = 0
+
     const resultFrequency = new Uint8Array(frequency.length * 2)
 
     const getFrame = () => {
-      requestAnimationFrame(getFrame)
       frequency = getFrequencyData(frequency)
 
       // Make mirrored frequency for better visualization
       resultFrequency.set(frequency)
       resultFrequency.set(frequency, frequency.length)
 
-      this.props.sheet.update(resultFrequency)
+      this.props.sheet.update({
+        frequency: resultFrequency,
+        rotation: ++rotation * 0.1
+      })
+
+      requestAnimationFrame(getFrame)
     }
 
     // TODO: Remove after debugging
-    audio.currentTime = 120
+    audio.currentTime = 0
 
     audio.play()
     getFrame()

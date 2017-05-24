@@ -28,6 +28,12 @@ const styles = {
       lineHeight: 1.5
     }
   },
+  inner: {
+    overflow: 'hidden',
+    width: '100%',
+    height: '100%',
+    position: 'relative'
+  },
   title: {
     top: 20,
     left: 20,
@@ -78,11 +84,13 @@ class App extends Component {
     return (
       <GlobalStyles>
         <div className={classes.app}>
-          <div className={classes.title}>
-            HTML5 Aduio visualization with JSS
-          </div>
-          <div className={classes.scene}>
-            {this.renderPlayer()}
+          <div className={classes.inner}>
+            <div className={classes.title}>
+              HTML5 Aduio visualization with JSS
+            </div>
+            <div className={classes.scene}>
+              {this.renderPlayer()}
+            </div>
           </div>
         </div>
       </GlobalStyles>

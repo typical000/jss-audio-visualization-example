@@ -1,14 +1,13 @@
-// Define right audio context (Safari doesn't support without prefix)
-const AudioContext = window.AudioContext || window.webkitAudioContext
-
-const ctx = new AudioContext()
+const ctx = new (window.AudioContext || window.webkitAudioContext)()
 const analyser = ctx.createAnalyser()
+
 
 // TODO: Make changable via controls
 analyser.fftSize = 256
 analyser.minDecibels = -120 // -100
 analyser.maxDecibels = -30 // -30
 analyser.smoothingTimeConstant = 0.85 // 0.8
+
 
 export const loadAudio = url => new Promise((resolve) => {
   const audio = new Audio()
@@ -34,6 +33,6 @@ export const getFrequencyData = (frequencyData) => {
   return frequencyData
 }
 
-export const castFrequencyToFractional = frequency => frequency / 255
+export const castToFraction = frequency => frequency / 255
 
 export default loadAudio
