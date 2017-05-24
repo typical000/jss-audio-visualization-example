@@ -2,10 +2,18 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import injectSheet from 'react-jss'
 
-import {loadAudio} from '../utils/audio'
 import GlobalStyles from './GlobalStyles'
 import Player from './Player'
 import theme from '../theme'
+
+import {loadAudio} from '../utils/audio'
+import tick from '../utils/tick'
+
+let update
+
+tick(() => {
+  if (update) update()
+})
 
 const styles = {
   app: {
@@ -39,37 +47,28 @@ class App extends Component {
     classes: PropTypes.object.isRequired
   }
 
-  componentDidMount() {
-    loadAudio('media/music.mp3').then(this.onLoad)
+  constructor(props) {
+    super(props)
+    this.state = {
+      audio: false
+    }
   }
 
-  // TODO: Move to utils
-  onLoad = (audio) => {
-    // Define right audio context (Safari doesn't support without prefix)
-    const AudioContext = window.AudioContext || window.webkitAudioContext
+  componentDidMount() {
+    if (!this.state.audio) {
+      loadAudio('media/music.mp3').then((audio) => {
+        this.setState({audio})
+      })
+    }
+  }
 
-    const ctx = new AudioContext()
-    const audioSrc = ctx.createMediaElementSource(audio)
-    const analyser = ctx.createAnalyser()
-
-    // analyser.fftSize = 1024
-    analyser.fftSize = 32
-
-    audioSrc.connect(analyser)
-    // Preserva audio output
-    // audioSrc.connect(ctx.destination)
-
-    const frequencyData = new Uint8Array(analyser.frequencyBinCount)
-
-    const getFrame = () => {
-      requestAnimationFrame(getFrame)
-      analyser.getByteFrequencyData(frequencyData)
-
-      // console.log(frequencyData)
+  renderPlayer() {
+    const {classes} = this.props
+    if (this.state.audio) {
+      return <Player audio={this.state.audio} />
     }
 
-    audio.play()
-    getFrame()
+    return <div className={classes.loading}>Loading...</div>
   }
 
   render() {
@@ -82,7 +81,7 @@ class App extends Component {
             HTML5 Aduio visualization with JSS
           </div>
           <div className={classes.scene}>
-            <Player />
+            {this.renderPlayer()}
           </div>
         </div>
       </GlobalStyles>

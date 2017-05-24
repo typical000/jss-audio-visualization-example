@@ -4,9 +4,9 @@ import injectSheet from 'react-jss'
 import times from 'lodash/times'
 
 import theme from '../theme'
-import tick from '../utils/tick'
 
-let update
+import {connectFrequencyToAnalyser, getFrequencyData} from '../utils/audio'
+
 
 const amount = 128
 const radius = 100
@@ -82,16 +82,33 @@ times(amount, (i) => {
 // Get some examples from here:
 // https://w-labs.at/experiments/audioviz/
 
-tick(() => {
-  if (update) update()
-})
-
 class Player extends Component {
   static propTypes = {
-    classes: PropTypes.object.isRequired
+    classes: PropTypes.object.isRequired,
+    audio: PropTypes.object.isRequired
+  }
+
+  componentDidMount() {
+    const {audio} = this.props
+    let frequency = connectFrequencyToAnalyser(audio)
+
+    const getFrame = () => {
+      requestAnimationFrame(getFrame)
+      frequency = getFrequencyData(frequency)
+
+      // TODO: Connect changed frequency with styles
+      // console.log(frequency)
+    }
+
+    audio.play()
+    getFrame()
   }
 
   shouldComponentUpdate = () => false
+
+  componentWillUnmount() {
+    this.props.audio.pause()
+  }
 
   render() {
     const {classes} = this.props
