@@ -15,7 +15,7 @@ import {
 const amount = 256
 
 const radius = 100
-const maxSoundRadius = 250
+const maxSoundRadius = 200
 
 const styles = {
   player: {
@@ -44,7 +44,7 @@ const styles = {
     zIndex: 3,
     background: theme.background,
     boxShadow: [{
-      blur: 50,
+      blur: 30,
       spread: 2,
       color: theme.active
     }, {
@@ -70,7 +70,7 @@ times(amount, (i) => {
     composes: '$bar',
     transform: `rotate(${(360 / amount) * i}deg)`,
     background: ({frequency}) => frequency && `rgba(${frequency[i]}, ${frequency[i]}, 0, ${castToFraction(frequency[i])})`,
-    width: ({frequency}) => frequency && castToFraction(frequency[i]) * maxSoundRadius
+    width: ({frequency}) => frequency && castToFraction(frequency[i]) * (maxSoundRadius - radius) + radius
   }
 })
 
