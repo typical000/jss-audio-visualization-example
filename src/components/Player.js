@@ -25,15 +25,15 @@ const styles = {
     transform: ({rotation}) => `rotate(${rotation}deg)`,
     '&::after': {
       content: '""',
-      width: radius * 6,
-      height: radius * 6,
       position: 'absolute',
       zIndex: 1,
       background: `radial-gradient(closest-side, ${theme.active}, transparent)`,
       top: '50%',
       left: '50%',
       transform: 'translate(-50%, -50%)',
-      opacity: 0.15
+      opacity: 0.15,
+      width: ({averageFrequency}) => `${averageFrequency * 10 * radius}px`,
+      height: ({averageFrequency}) => `${averageFrequency * 10 * radius}px`
     }
   },
   circle: {
@@ -43,15 +43,11 @@ const styles = {
     position: 'relative',
     zIndex: 3,
     background: theme.background,
-    boxShadow: [{
-      blur: 30,
-      spread: 2,
-      color: theme.active
-    }, {
-      inset: 'inset',
-      blur: 10,
-      color: theme.active
-    }]
+    transform: ({averageFrequency}) => `scale(${1 + (averageFrequency / 3)})`,
+    boxShadow: ({averageFrequency}) => {
+      if (averageFrequency <= 0.5) return `0 0 5px 1px ${theme.active}, inset 0 0 5px 1px ${theme.active}`
+      return `0 0 ${averageFrequency * 30}px 2px ${theme.active}, inset 0 0 ${averageFrequency * 20}px 1px ${theme.active}`
+    }
   },
   bar: {
     transformOrigin: [0, '50%'],
@@ -100,6 +96,7 @@ class Player extends Component {
 
       this.props.sheet.update({
         frequency: resultFrequency,
+        averageFrequency: castToFraction(frequency[frequency.length / 2]),
         rotation: ++rotation * 0.1
       })
 
@@ -107,7 +104,7 @@ class Player extends Component {
     }
 
     // TODO: Remove after debugging
-    audio.currentTime = 0
+    audio.currentTime = 90
 
     audio.play()
     getFrame()
