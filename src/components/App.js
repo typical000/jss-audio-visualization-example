@@ -4,6 +4,7 @@ import injectSheet from 'react-jss'
 
 import GlobalStyles from './GlobalStyles'
 import Player from './Player'
+import InlinePlayer from './InlinePlayer'
 import Controls from './Controls'
 import theme from '../theme'
 
@@ -86,13 +87,17 @@ class App extends Component {
 
   renderPlayer() {
     const {classes} = this.props
-    const {audio, density} = this.state
+    const {audio, density, engine} = this.state
 
-    if (audio) {
+    if (!audio) {
+      return <div className={classes.loading}>Loading...</div>
+    }
+
+    if (engine === 'jss') {
       return <Player audio={audio} density={density} />
     }
 
-    return <div className={classes.loading}>Loading...</div>
+    return <InlinePlayer audio={audio} density={density} />
   }
 
   render() {

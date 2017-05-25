@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import injectSheet from 'react-jss'
 import times from 'lodash/times'
 
+import {radius, maxRadius} from '../constants'
 import theme from '../theme'
 
 import {
@@ -11,12 +12,9 @@ import {
   castToFraction
 } from '../utils/audio'
 
-const radius = 100
-const maxSoundRadius = 200
-
 const getBarWidth = (frequency, index) => {
   if (frequency) {
-    return (castToFraction(frequency[index]) * (maxSoundRadius - radius)) + radius
+    return (castToFraction(frequency[index]) * (maxRadius - radius)) + radius
   }
   return false
 }
@@ -62,7 +60,7 @@ const styles = {
   },
   bar: {
     transformOrigin: [0, '50%'],
-    maxWidth: maxSoundRadius,
+    maxWidth: maxRadius,
     position: 'absolute',
     top: '50%',
     left: '50%',
@@ -77,11 +75,7 @@ class Player extends Component {
     sheet: PropTypes.object.isRequired,
     classes: PropTypes.object.isRequired,
     audio: PropTypes.object.isRequired,
-    density: PropTypes.number
-  }
-
-  static defaultProps = {
-    density: 128
+    density: PropTypes.number.isRequired
   }
 
   constructor(props) {
