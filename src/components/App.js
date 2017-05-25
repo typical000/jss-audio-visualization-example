@@ -4,6 +4,7 @@ import injectSheet from 'react-jss'
 
 import GlobalStyles from './GlobalStyles'
 import Player from './Player'
+import Controls from './Controls'
 import theme from '../theme'
 
 import {loadAudio} from '../utils/audio'
@@ -34,11 +35,15 @@ const styles = {
     height: '100%',
     position: 'relative'
   },
-  title: {
+  header: {
     top: 20,
     left: 20,
     position: 'absolute',
     zIndex: 10
+  },
+  title: {
+    marginBottom: 10,
+    fontWeight: 'bold'
   },
   scene: {
     position: 'absolute',
@@ -57,7 +62,9 @@ class App extends Component {
     super(props)
 
     this.state = {
-      audio: false
+      audio: false,
+      density: 256,
+      engine: 'jss'
     }
   }
 
@@ -69,10 +76,20 @@ class App extends Component {
     }
   }
 
+  setDensity = (e) => {
+    this.setState({density: +e.target.textContent})
+  }
+
+  setEngine = (e) => {
+    this.setState({engine: e.target.dataset.key})
+  }
+
   renderPlayer() {
     const {classes} = this.props
-    if (this.state.audio) {
-      return <Player audio={this.state.audio} />
+    const {audio, density} = this.state
+
+    if (audio) {
+      return <Player audio={audio} density={density} />
     }
 
     return <div className={classes.loading}>Loading...</div>
@@ -80,13 +97,22 @@ class App extends Component {
 
   render() {
     const {classes} = this.props
+    const {density, engine} = this.state
 
     return (
       <GlobalStyles>
         <div className={classes.app}>
           <div className={classes.inner}>
-            <div className={classes.title}>
-              HTML5 Aduio visualization with JSS
+            <div className={classes.header}>
+              <div className={classes.title}>
+                HTML5 Aduio visualization with JSS
+              </div>
+              <Controls
+                density={density}
+                engine={engine}
+                onEngineClick={this.setEngine}
+                onDistanceClick={this.setDensity}
+              />
             </div>
             <div className={classes.scene}>
               {this.renderPlayer()}

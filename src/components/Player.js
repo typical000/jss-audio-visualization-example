@@ -11,11 +11,22 @@ import {
   castToFraction
 } from '../utils/audio'
 
-// TODO: Make changable via controls
-const amount = 256
-
 const radius = 100
 const maxSoundRadius = 200
+
+const getBarWidth = (frequency, index) => {
+  if (frequency) {
+    return (castToFraction(frequency[index]) * (maxSoundRadius - radius)) + radius
+  }
+  return false
+}
+
+const getBarBackground = (frequency, index) => {
+  if (frequency) {
+    return `rgba(${frequency[index]}, ${frequency[index]}, 0, ${castToFraction(frequency[index])})`
+  }
+  return false
+}
 
 const styles = {
   player: {
@@ -61,59 +72,86 @@ const styles = {
   }
 }
 
-times(amount, (i) => {
-  styles[`bar${i}`] = {
-    composes: '$bar',
-    transform: `rotate(${(360 / amount) * i}deg)`,
-    background: ({frequency}) => frequency && `rgba(${frequency[i]}, ${frequency[i]}, 0, ${castToFraction(frequency[i])})`,
-    width: ({frequency}) => frequency && castToFraction(frequency[i]) * (maxSoundRadius - radius) + radius
-  }
-})
-
 class Player extends Component {
   static propTypes = {
     sheet: PropTypes.object.isRequired,
     classes: PropTypes.object.isRequired,
-    audio: PropTypes.object.isRequired
+    audio: PropTypes.object.isRequired,
+    density: PropTypes.number
   }
 
-  componentDidMount() {
-    const {audio} = this.props
+  static defaultProps = {
+    density: 128
+  }
 
-    let frequency = connectFrequencyToAnalyser(audio, {
-      fftSize: amount
-    })
-    let rotation = 0
+  constructor(props) {
+    super(props)
 
-    const resultFrequency = new Uint8Array(frequency.length * 2)
+    const {audio, density} = props
 
-    const getFrame = () => {
-      frequency = getFrequencyData(frequency)
-
-      // Make mirrored frequency for better visualization
-      resultFrequency.set(frequency)
-      resultFrequency.set(frequency, frequency.length)
-
-      this.props.sheet.update({
-        frequency: resultFrequency,
-        averageFrequency: castToFraction(frequency[frequency.length / 2]),
-        rotation: ++rotation * 0.1
-      })
-
-      requestAnimationFrame(getFrame)
-    }
-
-    // TODO: Remove after debugging
+    // Just set starting point from good position :)
     audio.currentTime = 90
-
     audio.play()
-    getFrame()
+
+    this.updateScene(audio, density)
   }
 
-  shouldComponentUpdate = () => false
+  componentWillUpdate(nextProps) {
+    this.updateScene(this.props.audio, nextProps.density)
+  }
 
   componentWillUnmount() {
     this.props.audio.pause()
+  }
+
+  updateScene(audio, density) {
+    this.frequency = connectFrequencyToAnalyser(audio, {
+      fftSize: density
+    })
+
+    this.generateBarStyles(density)
+    // Cancel previous frame loop to avoid data accumulation
+    cancelAnimationFrame(this.frame)
+    this.updateFrame(this.frequency)
+  }
+
+  updateFrame(frequency, rotation = 0) {
+    const resultFrequency = new Uint8Array(frequency.length * 2)
+
+    frequency = getFrequencyData(frequency)
+    rotation += 0.1
+
+    // Make mirrored frequency for better visualization
+    resultFrequency.set(frequency)
+    resultFrequency.set(frequency, frequency.length)
+
+    this.props.sheet.update({
+      frequency: resultFrequency,
+      averageFrequency: castToFraction(frequency[frequency.length / 2]),
+      rotation
+    })
+
+    this.frame = requestAnimationFrame(this.updateFrame.bind(this, frequency, rotation))
+  }
+
+  generateBarStyles(density) {
+    const {sheet} = this.props
+
+    times(density, (i) => {
+      // Remove previously added style
+      sheet.deleteRule(`bar${i}`)
+      sheet.addRule(`bar${i}`, {
+        composes: '$bar',
+        transform: `rotate(${(360 / density) * i}deg)`,
+        background: ({frequency}) => getBarBackground(frequency, i),
+        width: ({frequency}) => getBarWidth(frequency, i),
+      })
+    })
+  }
+
+  generateBarMarkup() {
+    const {classes, density} = this.props
+    return times(density, i => <div key={i} className={classes[`bar${i}`]} />)
   }
 
   render() {
@@ -123,7 +161,7 @@ class Player extends Component {
       <div className={classes.player}>
         <div className={classes.circle} />
         <div className={classes.bars}>
-          {times(amount, i => <div key={i} className={classes[`bar${i}`]} />)}
+          {this.generateBarMarkup()}
         </div>
       </div>
     )

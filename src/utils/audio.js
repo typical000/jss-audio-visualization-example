@@ -1,5 +1,6 @@
 const ctx = new (window.AudioContext || window.webkitAudioContext)()
 const analyser = ctx.createAnalyser()
+let audioSrc
 
 export const loadAudio = url => new Promise((resolve) => {
   const audio = new Audio()
@@ -10,7 +11,13 @@ export const loadAudio = url => new Promise((resolve) => {
 })
 
 export const connectFrequencyToAnalyser = (audio, config) => {
-  const audioSrc = ctx.createMediaElementSource(audio)
+  if (typeof audioSrc === 'object') {
+    audioSrc.disconnect(analyser)
+    audioSrc.disconnect(ctx.destination)
+  }
+  else {
+    audioSrc = ctx.createMediaElementSource(audio)
+  }
 
   if (config) {
     analyser.fftSize = config.fftSize || 256
