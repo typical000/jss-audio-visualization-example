@@ -41,6 +41,7 @@ const styles = {
       left: '50%',
       transform: 'translate(-50%, -50%)',
       opacity: 0.15,
+      willChange: 'width, height',
       width: ({averageFrequency}) => `${averageFrequency * 10 * radius}px`,
       height: ({averageFrequency}) => `${averageFrequency * 10 * radius}px`
     }
@@ -52,6 +53,7 @@ const styles = {
     position: 'relative',
     zIndex: 3,
     background: theme.background,
+    willChange: 'transform',
     transform: ({averageFrequency}) => `scale(${1 + (averageFrequency / 3)})`,
     boxShadow: ({averageFrequency}) => {
       if (averageFrequency <= 0.5) return `0 0 5px 1px ${theme.active}, inset 0 0 5px 1px ${theme.active}`
@@ -131,14 +133,15 @@ class Player extends Component {
   generateBarStyles(density) {
     const {sheet} = this.props
 
+    // Remove previously added style and add new one
     times(density, (i) => {
-      // Remove previously added style
       sheet.deleteRule(`bar${i}`)
       sheet.addRule(`bar${i}`, {
         composes: '$bar',
         transform: `rotate(${(360 / density) * i}deg)`,
         background: ({frequency}) => getBarBackground(frequency, i),
         width: ({frequency}) => getBarWidth(frequency, i),
+        willChange: 'auto'
       })
     })
   }
