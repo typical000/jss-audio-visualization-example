@@ -40,6 +40,4 @@ export const getFrequencyData = (frequencyData) => {
   return frequencyData
 }
 
-export const castToFraction = frequency => frequency / 255
-
 export default loadAudio

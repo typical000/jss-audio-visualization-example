@@ -7,44 +7,34 @@ import {radius, maxRadius} from '../constants'
 import theme from '../theme'
 
 import {
-  connectFrequencyToAnalyser,
-  getFrequencyData,
+  getWidth,
+  getBackground,
   castToFraction
+} from '../utils/frequency'
+import {
+  connectFrequencyToAnalyser,
+  getFrequencyData
 } from '../utils/audio'
-
-const getBarWidth = (frequency, index) => {
-  if (frequency) {
-    return (castToFraction(frequency[index]) * (maxRadius - radius)) + radius
-  }
-  return false
-}
-
-const getBarBackground = (frequency, index) => {
-  if (frequency) {
-    return `rgba(${frequency[index]}, ${frequency[index]}, 0, ${castToFraction(frequency[index])})`
-  }
-  return false
-}
 
 const styles = {
   player: {
     width: radius * 2,
     height: radius * 2,
     position: 'relative',
+    willChange: 'transform',
     transform: ({rotation}) => `rotate(${rotation}deg)`,
-    '&::after': {
-      content: '""',
-      position: 'absolute',
-      zIndex: 1,
-      background: `radial-gradient(closest-side, ${theme.active}, transparent)`,
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      opacity: 0.15,
-      willChange: 'width, height',
-      width: ({averageFrequency}) => `${averageFrequency * 10 * radius}px`,
-      height: ({averageFrequency}) => `${averageFrequency * 10 * radius}px`
-    }
+  },
+  glow: {
+    position: 'absolute',
+    zIndex: 1,
+    background: `radial-gradient(closest-side, ${theme.active}, transparent)`,
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    opacity: 0.15,
+    willChange: 'width, height',
+    width: ({averageFrequency}) => `${averageFrequency * 10 * radius}px`,
+    height: ({averageFrequency}) => `${averageFrequency * 10 * radius}px`
   },
   circle: {
     width: '100%',
@@ -59,16 +49,6 @@ const styles = {
       if (averageFrequency <= 0.5) return `0 0 5px 1px ${theme.active}, inset 0 0 5px 1px ${theme.active}`
       return `0 0 ${averageFrequency * 30}px 2px ${theme.active}, inset 0 0 ${averageFrequency * 20}px 1px ${theme.active}`
     }
-  },
-  bar: {
-    transformOrigin: [0, '50%'],
-    maxWidth: maxRadius,
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    height: 2,
-    borderRadius: 10,
-    zIndex: 2
   }
 }
 
@@ -110,6 +90,7 @@ class Player extends Component {
   }
 
   componentWillUnmount() {
+    cancelAnimationFrame(this.frame)
     this.props.audio.pause()
   }
 
@@ -145,15 +126,23 @@ class Player extends Component {
 
   generateBarStyles(density) {
     const {sheet} = this.props
+    const barWeight = Math.ceil(360 / density)
 
     // Remove previously added style and add new one
     times(density, (i) => {
       sheet.deleteRule(`bar${i}`)
       sheet.addRule(`bar${i}`, {
-        composes: '$bar',
+        transformOrigin: [0, '50%'],
+        maxWidth: maxRadius,
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        height: barWeight,
+        borderRadius: 10,
+        zIndex: 2,
         transform: `rotate(${(360 / density) * i}deg)`,
-        background: ({frequency}) => getBarBackground(frequency, i),
-        width: ({frequency}) => getBarWidth(frequency, i),
+        background: ({frequency}) => getBackground(frequency, i),
+        width: ({frequency}) => getWidth(frequency, i),
         willChange: 'auto'
       })
     })
@@ -169,6 +158,7 @@ class Player extends Component {
 
     return (
       <div className={classes.player}>
+        <div className={classes.glow} />
         <div className={classes.circle} />
         <div className={classes.bars}>
           {this.generateBarMarkup()}
