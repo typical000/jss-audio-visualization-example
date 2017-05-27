@@ -12,8 +12,8 @@ module.exports = {
     vendor: Object.keys(dependencies)
   },
   output: {
-    path: path.join(__dirname, 'dist'),
-    publicPath: '/dist',
+    path: path.join(__dirname, 'docs'),
+    publicPath: '/docs',
     filename: 'bundle.js'
   },
   module: {

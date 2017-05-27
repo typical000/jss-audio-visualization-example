@@ -14,7 +14,7 @@
   "license": "MIT",
   "scripts": {
     "dev-server": "cross-env NODE_ENV=development PORT=3000 node ./bin/webpack-dev-server.js",
-    "clean": "rimraf -fr './dist/**'",
+    "clean": "rimraf -fr './docs/**'",
     "build:dev": "npm run clean && cross-env NODE_ENV=development webpack --config ./webpack.config.dev",
     "build:prod": "npm run clean && cross-env NODE_ENV=production webpack --config ./webpack.config.prod",
     "lint": "eslint ./src",
