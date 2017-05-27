@@ -1,8 +1,10 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import injectSheet from 'react-jss'
+import isMobile from 'is-mobile'
 
 import GlobalStyles from './GlobalStyles'
+import PlayButton from './PlayButton'
 import Player from './Player'
 import InlinePlayer from './InlinePlayer'
 import Controls from './Controls'
@@ -51,6 +53,14 @@ const styles = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)'
+  },
+  control: {
+    composes: '$scene',
+    zIndex: 2,
+    border: 0,
+    outline: 0,
+    padding: 0,
+    background: 'transparent'
   }
 }
 
@@ -64,9 +74,12 @@ class App extends Component {
 
     this.state = {
       audio: false,
+      playing: !isMobile(),
       density: 256,
       engine: 'jss'
     }
+
+    this.togglePlaying = this.togglePlaying.bind(this)
   }
 
   componentDidMount() {
@@ -85,24 +98,28 @@ class App extends Component {
     this.setState({engine: e.target.dataset.key})
   }
 
+  togglePlaying = () => {
+    this.setState({playing: !this.state.playing})
+  }
+
   renderPlayer() {
     const {classes} = this.props
-    const {audio, density, engine} = this.state
+    const {audio, playing, density, engine} = this.state
 
     if (!audio) {
       return <div className={classes.loading}>Loading...</div>
     }
 
     if (engine === 'jss') {
-      return <Player audio={audio} density={density} />
+      return <Player audio={audio} density={density} playing={playing} />
     }
 
-    return <InlinePlayer audio={audio} density={density} />
+    return <InlinePlayer audio={audio} density={density} playing={playing} />
   }
 
   render() {
     const {classes} = this.props
-    const {density, engine} = this.state
+    const {audio, playing, density, engine} = this.state
 
     return (
       <GlobalStyles>
@@ -119,6 +136,9 @@ class App extends Component {
                 onDistanceClick={this.setDensity}
               />
             </div>
+            <button className={classes.control} onClick={this.togglePlaying}>
+              {audio && <PlayButton active={playing} />}
+            </button>
             <div className={classes.scene}>
               {this.renderPlayer()}
             </div>

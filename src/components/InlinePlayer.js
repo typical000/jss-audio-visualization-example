@@ -3,8 +3,7 @@ import PropTypes from 'prop-types'
 
 import {
   connectFrequencyToAnalyser,
-  getFrequencyData,
-  castToFraction
+  getFrequencyData
 } from '../utils/audio'
 
 // Just want to say - sorry for big performance impact :)
@@ -58,11 +57,11 @@ export default class InlinePlayer extends Component {
   }
 
   generateBarStyles(density) {
-    
+    console.log(this, density)
   }
 
   generateBarMarkup() {
-
+    console.log(this)
   }
 
   render() {

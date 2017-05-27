@@ -77,19 +77,32 @@ class Player extends Component {
     sheet: PropTypes.object.isRequired,
     classes: PropTypes.object.isRequired,
     audio: PropTypes.object.isRequired,
+    playing: PropTypes.bool.isRequired,
     density: PropTypes.number.isRequired
   }
 
   constructor(props) {
     super(props)
 
-    const {audio, density} = props
-
     // Just set starting point from good position :)
-    audio.currentTime = 90
-    audio.play()
+    if (props.playing) {
+      props.audio.currentTime = 90
+      props.audio.play()
+    }
 
-    this.updateScene(audio, density)
+    this.updateScene(props.audio, props.density)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const {audio} = this.props
+    if (nextProps.playing) audio.play()
+    else audio.pause()
+  }
+
+  shouldComponentUpdate(nextProps) {
+    // Avoid updating when user just changes play or pause
+    if (this.props.playing !== nextProps.playing) return false
+    return true
   }
 
   componentWillUpdate(nextProps) {
