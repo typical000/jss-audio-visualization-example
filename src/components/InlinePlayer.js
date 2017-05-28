@@ -90,7 +90,7 @@ export default class InlinePlayer extends Component {
     const {frequency} = this.state
     const barWeight = Math.ceil(360 / density)
 
-    return times(density, i => {
+    return times(density, (i) => {
       if (!frequency) return <div />
 
       return (<div
@@ -129,7 +129,6 @@ export default class InlinePlayer extends Component {
       background: `radial-gradient(closest-side, ${theme.active}, transparent)`,
       top: '50%',
       left: '50%',
-      transform: 'translate(-50%, -50%)',
       opacity: 0.15,
       willChange: 'transform',
       width: radius,
