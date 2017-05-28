@@ -30,11 +30,10 @@ const styles = {
     background: `radial-gradient(closest-side, ${theme.active}, transparent)`,
     top: '50%',
     left: '50%',
-    transform: 'translate(-50%, -50%)',
     opacity: 0.15,
-    willChange: 'width, height',
-    width: ({averageFrequency}) => `${averageFrequency * 10 * radius}px`,
-    height: ({averageFrequency}) => `${averageFrequency * 10 * radius}px`
+    width: radius,
+    height: radius,
+    transform: ({averageFrequency}) => `translate(-50%, -50%) scale(${averageFrequency * 10})`
   },
   circle: {
     width: '100%',
@@ -142,8 +141,7 @@ class Player extends Component {
         zIndex: 2,
         transform: `rotate(${(360 / density) * i}deg)`,
         background: ({frequency}) => getBackground(frequency, i),
-        width: ({frequency}) => getWidth(frequency, i),
-        willChange: 'auto'
+        width: ({frequency}) => getWidth(frequency, i)
       })
     })
   }

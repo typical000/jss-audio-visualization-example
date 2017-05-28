@@ -104,8 +104,7 @@ export default class InlinePlayer extends Component {
           zIndex: 2,
           transform: `rotate(${(360 / density) * i}deg)`,
           background: getBackground(frequency, i),
-          width: getWidth(frequency, i),
-          willChange: 'auto'
+          width: getWidth(frequency, i)
         }}
       />
     ))
@@ -130,9 +129,10 @@ export default class InlinePlayer extends Component {
       left: '50%',
       transform: 'translate(-50%, -50%)',
       opacity: 0.15,
-      willChange: 'width, height',
-      width: `${averageFrequency * 10 * radius}px`,
-      height: `${averageFrequency * 10 * radius}px`
+      willChange: 'transform',
+      width: radius,
+      height: radius,
+      transform: `translate(-50%, -50%) scale(${averageFrequency * 10})`
     }
 
     const circleStyles = {
