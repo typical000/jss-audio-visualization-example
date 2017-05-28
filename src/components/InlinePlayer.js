@@ -6,13 +6,9 @@ import {radius, maxRadius} from '../constants'
 import theme from '../theme'
 
 import {
-  getWidth,
-  getBackground,
-  castToFraction
-} from '../utils/frequency'
-import {
   connectFrequencyToAnalyser,
-  getFrequencyData
+  getFrequencyData,
+  castToFraction
 } from '../utils/audio'
 
 
@@ -30,7 +26,7 @@ export default class InlinePlayer extends Component {
     this.state = {
       rotation: 0,
       averageFrequency: 0,
-      frequency: []
+      frequency: null
     }
 
     // Just set starting point from good position :)
@@ -90,26 +86,25 @@ export default class InlinePlayer extends Component {
     const {frequency} = this.state
     const barWeight = Math.ceil(360 / density)
 
-    return times(density, (i) => {
-      if (!frequency) return <div />
+    if (!frequency) return <div />
 
-      return (<div
-        key={i}
-        style={{
-          transformOrigin: '0 50%',
-          maxWidth: maxRadius,
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          height: barWeight,
-          borderRadius: '10px',
-          zIndex: 2,
-          width: radius,
-          transform: `rotate(${(360 / density) * i}deg) scale(${getWidth(frequency, i)}, 1)`,
-          background: getBackground(frequency, i)
-        }}
-      />)
-    })
+    return times(density, i => (<div
+      key={i}
+      style={{
+        transformOrigin: '0 50%',
+        maxWidth: maxRadius,
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        height: barWeight,
+        borderRadius: '10px',
+        zIndex: 2,
+        width: radius,
+        background: theme.active,
+        transform: `rotate(${(360 / density) * i}deg) scale(${1 + castToFraction(frequency[i])}, 1)`,
+        opacity: castToFraction(frequency[i])
+      }}
+    />))
   }
 
   render() {
@@ -137,24 +132,42 @@ export default class InlinePlayer extends Component {
     }
 
     const circleStyles = {
+      position: 'relative',
+      width: '100%',
+      height: '100%',
+      zIndex: 3,
+      willChange: 'transform',
+      transform: `scale(${1 + (averageFrequency / 3)})`,
+    }
+
+    const outerStyles = {
+      position: 'relative',
       width: '100%',
       height: '100%',
       borderRadius: '50%',
-      position: 'relative',
-      zIndex: 3,
-      background: theme.background,
-      willChange: 'transform',
-      transform: `scale(${1 + (averageFrequency / 3)})`,
-      boxShadow: (() => {
-        if (averageFrequency <= 0.5) return `0 0 5px 1px ${theme.active}, inset 0 0 5px 1px ${theme.active}`
-        return `0 0 ${averageFrequency * 30}px 2px ${theme.active}, inset 0 0 ${averageFrequency * 20}px 1px ${theme.active}`
-      })()
+      zIndex: 4,
+      background: `radial-gradient(closest-side, ${theme.background} 95%, ${theme.active} 105%)`
+    }
+
+    const innerStyles = {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      bottom: 0,
+      right: 0,
+      borderRadius: '50%',
+      zIndex: 2,
+      background: `radial-gradient(closest-side, ${theme.active} 80%, rgba(0,0,0,0) 100%)`,
+      transform: `scale(${1 + (averageFrequency / 5)})`
     }
 
     return (
       <div style={playerStyles}>
         <div style={glowStyles} />
-        <div style={circleStyles} />
+        <div style={circleStyles}>
+          <div style={outerStyles} />
+          <div style={innerStyles} />
+        </div>
         <div>
           {this.generateBarMarkup()}
         </div>

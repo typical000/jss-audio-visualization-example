@@ -7,13 +7,9 @@ import {radius, maxRadius} from '../constants'
 import theme from '../theme'
 
 import {
-  getWidth,
-  getBackground,
-  castToFraction
-} from '../utils/frequency'
-import {
   connectFrequencyToAnalyser,
-  getFrequencyData
+  getFrequencyData,
+  castToFraction
 } from '../utils/audio'
 
 const styles = {
@@ -36,18 +32,35 @@ const styles = {
     transform: ({averageFrequency}) => `translate(-50%, -50%) scale(${averageFrequency * 10})`
   },
   circle: {
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+    zIndex: 3,
+    willChange: 'transform',
+    transform: ({averageFrequency}) => `scale(${1 + (averageFrequency / 3)})`
+  },
+  inner: {
+    position: 'relative',
     width: '100%',
     height: '100%',
     borderRadius: '50%',
-    position: 'relative',
-    zIndex: 3,
-    background: theme.background,
-    willChange: 'transform',
-    transform: ({averageFrequency}) => `scale(${1 + (averageFrequency / 3)})`,
-    boxShadow: ({averageFrequency}) => {
-      if (averageFrequency <= 0.5) return `0 0 5px 1px ${theme.active}, inset 0 0 5px 1px ${theme.active}`
-      return `0 0 ${averageFrequency * 30}px 2px ${theme.active}, inset 0 0 ${averageFrequency * 20}px 1px ${theme.active}`
-    }
+    zIndex: 4,
+    background: `radial-gradient(
+      closest-side,
+      ${theme.background} 95%,
+      ${theme.active} 105%
+    )`
+  },
+  outer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0,
+    borderRadius: '50%',
+    zIndex: 2,
+    background: `radial-gradient(closest-side, ${theme.active} 80%, rgba(0,0,0,0) 100%)`,
+    transform: ({averageFrequency}) => `scale(${1 + (averageFrequency / 5)})`
   }
 }
 
@@ -140,8 +153,9 @@ class Player extends Component {
         borderRadius: 10,
         zIndex: 2,
         width: radius,
-        transform: ({frequency}) => `rotate(${(360 / density) * i}deg) scale(${getWidth(frequency, i)}, 1)`,
-        background: ({frequency}) => getBackground(frequency, i)
+        background: theme.active,
+        transform: ({frequency}) => frequency && `rotate(${(360 / density) * i}deg) scale(${1 + castToFraction(frequency[i])}, 1)`,
+        opacity: ({frequency}) => frequency && castToFraction(frequency[i])
       })
     })
   }
@@ -157,7 +171,10 @@ class Player extends Component {
     return (
       <div className={classes.player}>
         <div className={classes.glow} />
-        <div className={classes.circle} />
+        <div className={classes.circle}>
+          <div className={classes.outer} />
+          <div className={classes.inner} />
+        </div>
         <div className={classes.bars}>
           {this.generateBarMarkup()}
         </div>
