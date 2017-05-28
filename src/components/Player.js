@@ -139,9 +139,9 @@ class Player extends Component {
         height: barWeight,
         borderRadius: 10,
         zIndex: 2,
-        transform: `rotate(${(360 / density) * i}deg)`,
-        background: ({frequency}) => getBackground(frequency, i),
-        width: ({frequency}) => getWidth(frequency, i)
+        width: radius,
+        transform: ({frequency}) => `rotate(${(360 / density) * i}deg) scale(${getWidth(frequency, i)}, 1)`,
+        background: ({frequency}) => getBackground(frequency, i)
       })
     })
   }

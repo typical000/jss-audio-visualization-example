@@ -90,8 +90,10 @@ export default class InlinePlayer extends Component {
     const {frequency} = this.state
     const barWeight = Math.ceil(360 / density)
 
-    return times(density, i => (
-      <div
+    return times(density, i => {
+      if (!frequency) return <div />
+
+      return (<div
         key={i}
         style={{
           transformOrigin: '0 50%',
@@ -102,12 +104,12 @@ export default class InlinePlayer extends Component {
           height: barWeight,
           borderRadius: '10px',
           zIndex: 2,
-          transform: `rotate(${(360 / density) * i}deg)`,
-          background: getBackground(frequency, i),
-          width: getWidth(frequency, i)
+          width: radius,
+          transform: `rotate(${(360 / density) * i}deg) scale(${getWidth(frequency, i)}, 1)`,
+          background: getBackground(frequency, i)
         }}
-      />
-    ))
+      />)
+    })
   }
 
   render() {
